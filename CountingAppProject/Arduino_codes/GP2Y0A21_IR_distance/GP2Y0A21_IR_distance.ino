@@ -1,4 +1,4 @@
-int IRpin = 32;
+int IRpin = 32; // Put sensor_value pin to 32
 int sensor_val;
 float dist;
 
