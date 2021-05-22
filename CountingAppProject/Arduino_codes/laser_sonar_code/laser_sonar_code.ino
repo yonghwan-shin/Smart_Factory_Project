@@ -1,27 +1,68 @@
-int IRpin = 34; // Put sensor_value pin to 32
+#define echoPin 32
+#define trigPin 33
+#include "WiFi.h"
+
+int IRpin = 34;
 int sensor_val;
 float dist;
-#define echoPin 32 // attach pin 32 Arduino to pin Echo of HC-SR04
-#define trigPin 33 //attach pin 33 Arduino to pin Trig of HC-SR04
 
 
-// defines variables
-long duration; // variable for the duration of sound wave travel
-int distance; // variable for the distance measurement
-
-
-
+long duration;
+int distance;
 
 void setup() {
-  // put your setup code here, to run once:
-pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
-  pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
   Serial.begin(115200);
+
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+
+  Serial.println("WiFi Setup done");
+
+  Serial.println("scan start");
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0) {
+    Serial.println("no networks found");
+  }
+  else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i) {
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.print(")");
+      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "*");
+      delay(10);
+      char ssid[] = "JE_InP_Fac" ;
+      char pass[] = "142536nm@@";
+      String string_ssid = ssid;
+      if (WiFi.SSID(i).equals(ssid) == 0) {
+        WiFi.begin(ssid, pass);
+
+        while (WiFi.status() != WL_CONNECTED)
+        {
+          delay(500);
+          Serial.println("loading..");
+        }
+        Serial.print("Connected to network. My IP address is: ");
+        Serial.println(WiFi.localIP());
+        break;
+      }
+    }
+  }
+  Serial.println("");
+  delay(5000);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-digitalWrite(trigPin, LOW);
+  digitalWrite(trigPin, LOW);
   delayMicroseconds(5);
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
